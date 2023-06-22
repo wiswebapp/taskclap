@@ -108,8 +108,12 @@
                             <tbody>
                                 <tr><th>Name</th><td>{{ $order->name }}</td></tr>
                                 <tr><th>Phone</th><td>{{ $order->phone }}</td></tr>
-                                <tr><th>Email</th><td>{{ $order->email }}</td></tr>
+                                <tr><th>Email</th><td>{{ ($order->email) ? $order->email : '--' }}</td></tr>
+                                @if($order->user->address_lat && $order->user->address_long)
                                 <tr><th>Address (Map)</th><td>{{ $order->user->address_lat }},{{ $order->user->address_long }}</td></tr>
+                                @else
+                                <tr><th>Address</th><td>--</td></tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -197,55 +201,83 @@
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" id="printable-invoice">
                         <div class="row" style="margin-bottom: 6em;">
                             <div class="col-12 table-responsive">
-                                <table class="table table-striped">
+                                <div class="row invoice-info">
+
+                                    <div class="col-sm-4 invoice-col">
+                                        <b>Order ID:</b> #{{ $orderDetail->order }}<br>
+                                        <b>Order Date:</b> {{ formatDt($orderDetail->created_at) }}
+                                    </div>
+
+                                    <div class="col-sm-5 invoice-col">
+
+                                    </div>
+
+                                    <div class="col-sm-3 invoice-col">
+                                        To
+                                        <address>
+                                            <strong>{{ $order->user->name }}</strong><br>
+                                            {{ $order->user->house_no }}, {{ $order->user->landmark }}<br>
+                                            {{ $order->user->address }}<br>
+                                            <span class="text-bold">Phone: </span> {{ $order->user->phone }}<br>
+                                            <span class="text-bold">Email: </span> {{ ($order->user->email) ? $order->user->email : 'n/a' }}
+                                        </address>
+                                    </div>
+
+                                </div>
+                                <p class="btn btn-sm">{{ $orderDetail->product->category->name }} <i class="fa fa-sm fa-arrow-right"></i> {{ $orderDetail->product->subcategory->name }}</p>
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Qty</th>
+                                            <th>#</th>
                                             <th style="width: 20%;">Product</th>
                                             <th style="width: 60%">Description</th>
                                             <th style="width: 10%;">Warranty</th>
                                             <th style="width: 10%;">Price</th>
-                                            @if((empty($orderDetail->material_charge) || empty($orderDetail->additional_charge)))
+                                            @if($order->order_status == "Pending" && (empty($orderDetail->material_charge) || empty($orderDetail->additional_charge)))
                                             <th>Action</th>
                                             @endif
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($order->orderDetail as $orderDetail)
-                                            <tr>
-                                                <td>1</td>
+                                            <tr style="background:#b0b0b0">
+                                                <td>{{$loop->iteration}}</td>
                                                 <td>{{ $orderDetail->product_title }}</td>
                                                 <td>-</td>
                                                 <td>{{ $orderDetail->warranty }} Days</td>
                                                 <td>₹ {{ $orderDetail->product_price }}</td>
-                                                @if((empty($orderDetail->material_charge) || empty($orderDetail->additional_charge)))
+                                                @if($order->order_status == "Pending")
                                                 <td>
                                                     @if($orderDetail->material_charge === null)
-                                                    <button class="btn btn-sm btn-default addMaterialCharge">Add Material Charges</button><br>
+                                                    <button data-id="{{ $orderDetail->id }}" class="btn btn-sm btn-default addMaterialCharge"><i class="fa fa-plus fa-sm"></i> Material Charges</button><br>
                                                     @endif
                                                     @if($orderDetail->additional_charge === null)
-                                                    <button class="btn btn-sm btn-default addAdditionalCharge">Add Additional Charges</button>
+                                                    <button data-id="{{ $orderDetail->id }}" class="btn btn-sm btn-default addAdditionalCharge"><i class="fa fa-plus fa-sm"></i> Additional Charges</button>
                                                     @endif
                                                 </td>
                                                 @endif
                                             </tr>
                                             @if($orderDetail->material_description)
                                             <tr>
-                                                <td>1</td>
+                                                <td></td>
                                                 <td>Material Charges</td>
-                                                <td>{{ $orderDetail->material_description }}</td>
+                                                <td>
+                                                    <textarea style="width: 100%;border:none;resize: none;pointer-events: none;" readonly>{{$orderDetail->material_description}}</textarea>
+                                                </td>
                                                 <td>{{ $orderDetail->warranty }} Days</td>
                                                 <td>₹ {{ $orderDetail->material_charge }}</td>
                                             </tr>
                                             @endif
                                             @if($orderDetail->additional_charge_description)
                                             <tr>
-                                                <td>1</td>
+                                                <td></td>
                                                 <td>Additional Charges</td>
-                                                <td>{{ $orderDetail->additional_charge_description }}</td>
+                                                <td>
+                                                    <textarea style="width: 100%;border:none;resize: none;pointer-events: none;" readonly>{{ $orderDetail->additional_charge_description }}</textarea>
+                                                </td>
                                                 <td>{{ $orderDetail->warranty }} Days</td>
                                                 <td>₹ {{ $orderDetail->additional_charge }}</td>
                                             </tr>
@@ -258,21 +290,24 @@
                         </div>
                         <div class="row">
                             <div class="col-6">
-                                <p class="lead">Order Placed On : <strong>{{ date('d M Y (h:ia)', strtotime($order->created_at)) }}</strong></p>
-                                <p class="lead">Order Status : <strong>{{ $order->order_status }}</strong></p>
-                                <p class="lead">Payment Status: <strong>{{ $order->payment_status }}</strong></p>
-                                <p class="lead">Payment Type</p>
+                                <p>Order Status : <span class="text-bold">{{ $order->order_status }}</span></p>
+                                <p>Payment Status: <span class="text-bold">{{ $order->payment_status }}</span></p>
+                                <p>Payment Type : <span class="text-bold">{{ $order->payment_type }}</span></p>
                                 @if($order->payment_type == "Cash")
-                                <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" alt="Cash" style="height: 55px;">
+                                <img src="<?= asset('assets/img/payment/cash.png') ?>" alt="Cash" style="height: 30px;">
                                 @elseif($order->payment_type == "Upi")
-                                <img src="https://www.vectorlogo.zone/logos/upi/upi-ar21.png" alt="UPI" style="height: 55px;">
+                                <img src="<?= asset('assets/img/payment/upi.png') ?>" alt="Cash" style="height: 30px;">
                                 @elseif($order->payment_type == "NetBanking")
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKceKsLy4OFxVl6N0Qxh577deTABrBKYoxMPmmoY6ifg&usqp=CAU&ec=48665698" alt="UPI" style="height: 55px;">
+                                <img src="<?= asset('assets/img/payment/net_banking.png') ?>" alt="Cash" style="height: 32px;">
                                 @else
-                                <img src="https://t3.ftcdn.net/jpg/04/87/13/40/360_F_487134056_ttJAg56QAcB15RKhdOQUKPXGxwGt5xqB.jpg" alt="UPI" style="height: 55px;">
+                                <img src="<?= asset('assets/img/payment/pending.jpg') ?>" alt="Cash" style="height: 40px;">
                                 @endif
-                                <p class="text-muted well well-sm shadow-none" style="margin-top: 10px;"><strong>Notes: </strong>Warranty will be covered only on changed parts.</p>
-
+                                <p class="text-bold well well-sm shadow-none" style="margin: 2.6em 0 0 0;">Notes :</p>
+                                <ul class="px-3">
+                                    <li>Warranty will be covered only on changed parts.</li>
+                                    <li>No warrant will be covered on existing parts.</li>
+                                    <li>Please ask to provider for list of covered.</li>
+                                </ul>
                             </div>
                             <div class="col-6">
                                 <div class="table-responsive">
@@ -307,10 +342,20 @@
                                 </div>
                             </div>
                         </div>
+
+
+                        <div class="row no-print">
+                            <div class="col-12">
+                                <button onclick="printInvoice()" class="btn btn-default"><i class="fas fa-print"></i>Print</button>
+                                <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -348,23 +393,36 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ route('admin.orders.detail', $order) }}" method="POST">
-            <div class="modal-header">
-                <h4 class="modal-title">Add Charges Detail</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                @csrf
-                <input type="hidden" id="chargeType" name="type" value="">
-                <div class="chargeModalInput"></div>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary chargeTypeBtn"></button>
-            </div>
-        </form>
+                <input type="hidden" name="orderDetailId" id="orderDetailId">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Charges Detail</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @csrf
+                    <input type="hidden" id="chargeType" name="type" value="">
+                    <div class="chargeModalInput"></div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary chargeTypeBtn"></button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 @stop
+
+@section('js')
+<script>
+function printInvoice() {
+    var printContents = document.getElementById("printable-invoice").innerHTML;
+    var originalContents = document.body.innerHTML;
+    document.body.innerHTML = printContents;
+    window.print();
+    document.body.innerHTML = originalContents;
+}
+</script>
+@endsection

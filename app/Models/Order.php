@@ -12,21 +12,6 @@ class Order extends Model
 {
     use HasFactory;
 
-    const PAYMENT_STATUS = [
-        'Started',
-        'Pending',
-        'Completed',
-        'Failed'
-    ];
-    const ORDER_STATUS = [
-        'Placed',
-        'Completed',
-        'Pending',
-        'Cancelled',
-        'Failed',
-        'Rejected'
-    ];
-
     protected $fillable = [
         'order_id',
         'user_id',
@@ -37,6 +22,9 @@ class Order extends Model
         'phone',
         'email',
         'address',
+        'house_no',
+        'landmark',
+        'address_local',
         'pincode',
         'country_id',
         'state_id',
@@ -62,16 +50,23 @@ class Order extends Model
         'payment_status',
         'order_status',
         'order_notes',
-        'is_paid_to_provider',
+        'is_paid_to_provide',
     ];
 
-    protected function total(): Attribute{
-        return Attribute::make(get: fn (string $value) => number_format($value, 2));
-    }
-
-    protected function subtotal(): Attribute{
-        return Attribute::make(get: fn (string $value) => number_format($value, 2));
-    }
+    const PAYMENT_STATUS = [
+        'Started',
+        'Pending',
+        'Completed',
+        'Failed'
+    ];
+    const ORDER_STATUS = [
+        'Placed',
+        'Completed',
+        'Pending',
+        'Cancelled',
+        'Failed',
+        'Rejected'
+    ];
 
     public function provider(): BelongsTo
     {

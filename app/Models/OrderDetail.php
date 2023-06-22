@@ -10,7 +10,30 @@ class OrderDetail extends Model
 {
     use HasFactory;
 
-    public function order(): BelongsTo
+    protected $fillable = [
+        'order',
+        'order_id',
+        'product_id',
+        'category_id',
+        'sub_category_id',
+        'service_category_id',
+        'product_title',
+        'product_description',
+        'product_strike_price',
+        'material_charge',
+        'material_charge_actual',
+        'material_description',
+        'additional_charge',
+        'additional_charge_description',
+        'product_price',
+        'product_commission',
+        'warranty',
+        'product_approx_duration',
+        'order_status',
+        'order_note',
+    ];
+
+    public function orderData(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }

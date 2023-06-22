@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -74,6 +75,7 @@ class CategoryController extends Controller
                 $validated['image']
             );
         }
+        $validated['slug'] = Str::slug($validated['name']);
         $this->categoryRepository->create($validated);
 
         return redirect(route('admin.categorys.index'))->with('success', 'Data Created Successfully !');
@@ -101,7 +103,7 @@ class CategoryController extends Controller
                 $validated['image']
             );
         }
-
+        $validated['slug'] = Str::slug($validated['name']);
         $this->categoryRepository->update($category->id, $validated);
         return redirect(route('admin.categorys.index'))->with('success', 'Data Updated Successfully !');
     }

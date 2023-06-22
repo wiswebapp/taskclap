@@ -28,6 +28,11 @@ class OrderRepository
         return OrderDetail::where('order_id', $id)->update($newDetails);
     }
 
+    public function updateOrderDetailWithDetailId($id, array $newDetails)
+    {
+        return OrderDetail::where('id', $id)->update($newDetails);
+    }
+
     public function delete($id)
     {
         Order::destroy($id);

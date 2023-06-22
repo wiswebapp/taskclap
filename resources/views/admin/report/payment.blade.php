@@ -54,7 +54,7 @@
                     <td>₹ {{ $order->total }}</td>
                     <td>₹ {{ getOrderCommission($order) }}</td>
                     <td>₹ {{ ($order->tax) ? $order->tax : '0.00' }}</td>
-                    <td>₹ {{ ($order->total - getOrderCommission($order)) }}</td>
+                    <td>₹ {{ (($order->total - getOrderCommission($order)) - $order->material_charge_actual) }}</td>
                     <td>₹ {{ (getOrderCommission($order) - $order->tax) }}</td>
                     <td>{{ generate_badge($order->order_status) }}</td>
                     <td><span class='badge badge-info'>{{ $order->payment_type }}<span></td>

@@ -24,7 +24,7 @@ class OrderController extends Controller
     public function index(): View
     {
         return view('admin.order.index', [
-            'orderData' => Order::paginate(10),
+            'orderData' => Order::orderby('id', 'desc')->paginate(10),
         ]);
     }
 
@@ -87,12 +87,13 @@ class OrderController extends Controller
     {
         if ($chargeType == "material") {
             $request->validate([
+                'orderDetailId' => 'required',
                 'material_charge' => 'required|int|gt:0',
                 'material_charge_actual' => 'required|int|gt:0',
                 'material_description' => 'required|min:3|max:500',
             ]);
 
-            $this->orderRepository->updateOrderDetail($order->id, [
+            $this->orderRepository->updateOrderDetailWithDetailId($request->orderDetailId, [
                 'material_charge' => $request->material_charge,
                 'material_charge_actual' => $request->material_charge_actual,
                 'material_description' => $request->material_description,
@@ -103,11 +104,12 @@ class OrderController extends Controller
             ]);
         } else {
             $request->validate([
+                'orderDetailId' => 'required',
                 'additional_charge' => 'required|int|gt:0',
                 'additional_charge_description' => 'required|min:3|max:500',
             ]);
 
-            $this->orderRepository->updateOrderDetail($order->id, [
+            $this->orderRepository->updateOrderDetailWithDetailId($request->orderDetailId, [
                 'additional_charge' => $request->additional_charge,
                 'additional_charge_description' => $request->additional_charge_description,
             ]);

@@ -55,8 +55,12 @@ class CategoryRepository implements MasterInterface
         return $query;
     }
 
-    public function getById($id)
+    public function getById($id, $findBySlug = false)
     {
+        if ($findBySlug) {
+            return Category::where('slug', $id)->first();
+        }
+
         return Category::findOrFail($id);
     }
 

@@ -25,6 +25,7 @@ $(document).ready(function() {
         inputText += '<label>Material charge Description</label>';
         inputText += '<textarea name="material_description" class="form-control" required></textarea>';
         inputText += '</div>';
+        $("#orderDetailId").val($(this).attr('data-id'));
         $(".chargeTypeBtn").html("Add Material Charge");
         $("#chargeType").val("add_material_charge");
         $(".chargeModalInput").html(inputText);
@@ -40,6 +41,7 @@ $(document).ready(function() {
         inputText += '<label>Additional charge Description</label>';
         inputText += '<textarea name="additional_charge_description" class="form-control" required></textarea>';
         inputText += '</div>';
+        $("#orderDetailId").val($(this).attr('data-id'));
         $(".chargeTypeBtn").html("Add Additional Charge");
         $("#chargeType").val("add_additional_charge");
         $(".chargeModalInput").html(inputText);

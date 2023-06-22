@@ -1,5 +1,14 @@
 <?php
 
+function createSlug($string) {
+    $string = strtolower($string);
+    $string = str_replace(' ', '', $string);
+    $string = str_replace('-', '', $string);
+    $string = str_replace('/', '', $string);
+
+    return $string;
+}
+
 function formatNumber ($value, $decimal = 2) {
     return number_format($value, $decimal);
 }
@@ -36,8 +45,6 @@ function generate_badge($label) {
 /**
  * Returns the order commission based on order object
  * @param Object $order
- * @return float
- *
  */
 function getOrderCommission($order): float
 {
@@ -56,3 +63,48 @@ function getOrderCommission($order): float
 
     return number_format((float)$commissionAmt, 2);
 }
+
+/**
+ * Retrive cart Items From cookies
+ */
+function getCartItems(): array
+{
+    $cartItems = $_COOKIE['cartDetail'];
+    if (empty($cartItems)) {
+        return [];
+    }
+
+    $cartItems = json_decode($cartItems, true);
+    foreach($cartItems as $cart) {
+        $returnArr[$cart['productId']] = $cart['qty'];
+    }
+
+    return $returnArr;
+}
+
+/**
+     * Generates a secure encrypted data
+     * @return mixed
+     */
+    function encryptData(mixed $data)
+    {
+        return base64_encode($data);
+    }
+
+    /**
+     * Decrypt the encrypted data
+     * @return mixed
+     */
+    function decryptData(mixed $data)
+    {
+        return base64_decode($data);
+    }
+
+    /**
+     * Format date as per the given format
+     * @return string
+     */
+    function formatDt(string $date, $format = "d-M-Y")
+    {
+        return date($format, strtotime($date));
+    }

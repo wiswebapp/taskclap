@@ -41,9 +41,11 @@
                         <div id="map-canvas" style="min-height: 500px;"></div>
                     </div>
 
-                    <x-form-input name="address_lat" id="address_lat" readonly="true" type="text" label="Address Latitude" placeholder="Enter Address Latitude" value="{{ $user->address_lat }}" />
+                    <x-form-input name="address_lat" id="address_lat" readonly="true" type="text" label="Address Latitude" placeholder="Enter Address Latitude" value="22.9755" />
+                    {{-- {{ $user->address_lat }} --}}
 
-                    <x-form-input name="address_long" id="address_long" readonly="true" type="text" label="Address Longitude" placeholder="Enter Address Longitude" value="{{ $user->address_long }}" />
+                    <x-form-input name="address_long" id="address_long" readonly="true" type="text" label="Address Longitude" placeholder="Enter Address Longitude" value="72.6155" />
+                    {{-- {{ $user->address_long }} --}}
 
                     <x-form-textarea size="12" name="address" label="Address" placeholder="Enter Address" value="{{ $user->address }}" />
 
