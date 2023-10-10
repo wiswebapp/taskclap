@@ -1,3 +1,5 @@
+window.adminpath = "webadmin";
+
 $(document).ready(function() {
     $( ".select2" ).select2();
 
@@ -249,7 +251,8 @@ function fetchAndSetCategory(selected = '') {
     var options = "<option value=''>Select Category</option>";
     $.ajax({
         type : "GET",
-        url : "/api/category",
+        dataType: "json",
+        url : '/' + window.adminpath  + "/fetch/category",
         data : {},
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -281,7 +284,8 @@ function fetchAndSetSubCategory(cat, selected = '') {
         var options = "<option value=''>Select Sub Category</option>";
         $.ajax({
             type : "GET",
-            url : "/api/subcategory",
+            dataType: "json",
+            url : '/' + window.adminpath  + "/fetch/subcategory",
             data : {
                 category: cat
             },

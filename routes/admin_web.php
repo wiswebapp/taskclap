@@ -43,6 +43,10 @@ Route::prefix(config('app.admin_path_name'))->name('admin.')->group(function () 
         Route::get('report/wallet', [WalletController::class, 'index'])->name('report.wallet');
         Route::post('report/wallet', [WalletController::class, 'transaction']);
         Route::post('logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+        ///-----------------Ajax Request For Web-----------------\\\
+        Route::get('fetch/category', [CategoryController::class, 'fetchCategory'])->name('fetchCategory');
+        Route::get('fetch/subcategory', [CategoryController::class, 'fetchSubcategory'])->name('fetchSubCategory');
     });
 
 });

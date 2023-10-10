@@ -28,9 +28,19 @@ class Category extends Model
         'status',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+    ];
+
     public function children(): HasMany
     {
-        return $this->hasMany(Category::class , 'parent_id');
+        return $this->hasMany(Category::class , 'parent_id')->select('id', 'parent_id', 'name', 'slug', 'description', 'image', 'updated_at');
     }
 
     public function parent(): BelongsTo

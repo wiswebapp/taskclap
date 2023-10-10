@@ -117,4 +117,22 @@ class CategoryController extends Controller
         $this->categoryRepository->delete($category->id);
         echo json_encode(['success' => true]);
     }
+
+    public function fetchCategory(Request $request)
+    {
+        $data = $this->categoryRepository->getRaw(['status' => 'Active'])->where('parent_id', null)->select('id', 'name');
+        if ($cat = $request->id) {
+            $data->where('id', $cat);
+        }
+        echo json_encode(['success' => true,'data' => $data->get()]);
+    }
+
+    public function fetchSubcategory(Request $request)
+    {
+        $data = $this->categoryRepository->getRaw(['status' => 'Active'])->select('id', 'name');
+        if ($cat = $request->category) {
+            $data->where('parent_id', $cat);
+        }
+        echo json_encode(['success' => true,'data' => $data->get()]);
+    }
 }
